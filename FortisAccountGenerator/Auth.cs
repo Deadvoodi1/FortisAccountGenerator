@@ -1,6 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using RestSharp.Authenticators.OAuth2;
 
 namespace FortisAccountGenerator;
 
@@ -15,7 +16,6 @@ public class Auth
         body.Add("username", username);
         body.Add("password", password);
 
-       // var content = new FormUrlEncodedContent(body);
         RestResponse result = SingIn(body: body).Result;
         JObject jobject = (JObject) null;
         try
@@ -53,6 +53,35 @@ public class Auth
         endpoint = (string) null;
         client = (RestClient) null;
         request = (RestRequest) null;
+
+        return response;
+    }
+
+    public static async Task<RestResponse> Post(
+        Dictionary<string, string> pathParams = null,
+        Dictionary<string, string> headerParams = null,
+        Dictionary<string, string> queryParams = null,
+        string jsonBody = null)
+    {
+        string bearerToken = headerParams["Authorization"];
+        
+        string devApiHostName = "https://api-dev.http.dev.fortisds.tech";
+        string endpoint = "/web/current/onboarding/register";
+
+        RestClient client = new RestClient(new RestClientOptions(devApiHostName)
+        {
+            Authenticator = new OAuth2AuthorizationRequestHeaderAuthenticator(bearerToken, "Bearer")
+        });
+        RestRequest request = new RestRequest(endpoint);
+        request.AddStringBody(jsonBody, DataFormat.Json);
+
+        RestResponse response = await client.ExecutePostAsync(request);
+
+        bearerToken = null;
+        devApiHostName = null;
+        endpoint = null;
+        client = null;
+        request = null;
 
         return response;
     }
