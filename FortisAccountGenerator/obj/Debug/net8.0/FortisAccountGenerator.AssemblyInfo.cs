@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FortisAccountGenerator")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ef9e9eea5e3311f7e171d7d8678b3b9f2d52eb2e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1d4d680d809fcc837551c6b4cdca73b1a8632d85")]
 [assembly: System.Reflection.AssemblyProductAttribute("FortisAccountGenerator")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FortisAccountGenerator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

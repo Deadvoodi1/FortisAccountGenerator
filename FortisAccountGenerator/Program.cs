@@ -3,6 +3,7 @@ using System.Net;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using RestSharp;
 
 namespace FortisAccountGenerator
 {
@@ -10,35 +11,41 @@ namespace FortisAccountGenerator
     {
         public static void Main(string[] args)
         {
-            var context = ContextPrepare();
-            var accessToken = Auth.TokenGet("serviceone", "Service1");
-
-            var headerParams = new Dictionary<string, string>() { {"Authorization", accessToken} };
-            var jsonBody = JsonConvert.SerializeObject(context);
-
-            var responseFortisAccountCreate = Auth.Post(headerParams: headerParams, jsonBody: jsonBody).Result;
+            RestResponse responseFortisAccountCreate = null;
             
-            if (responseFortisAccountCreate.StatusCode != HttpStatusCode.Created)
+            do
             {
-                if (responseFortisAccountCreate.StatusCode == HttpStatusCode.InternalServerError)
-                {
-                    JObject jobject = (JObject) null;
-                    try
-                    {
-                        jobject = JObject.Parse(responseFortisAccountCreate.Content);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Message: {ex.Message} \r\n StackTrace:{ex.StackTrace}");
-                        throw;
-                    }
-                    Console.WriteLine($"Ошибка при создании аккаунта! Детали ошибки: \r\n {jobject["detail"]}");
-                    
-                }
-                Console.WriteLine("Что-то пошло не так, попробуйте ещё раз");
-            }
+                var context = ContextPrepare();
+                var accessToken = Auth.TokenGet("serviceone", "Service1");
+
+                var headerParams = new Dictionary<string, string>() { {"Authorization", accessToken} };
+                var jsonBody = JsonConvert.SerializeObject(context);
+
+                responseFortisAccountCreate = Auth.Post(headerParams: headerParams, jsonBody: jsonBody).Result;
             
-            Console.WriteLine("Компания успешно создана! На указанный email было выслано письмо с ссылкой на установление  пароля.");
+                if (responseFortisAccountCreate.StatusCode != HttpStatusCode.Created)
+                {
+                    if (responseFortisAccountCreate.StatusCode == HttpStatusCode.InternalServerError)
+                    {
+                        JObject jobject = (JObject) null;
+                        try
+                        {
+                            jobject = JObject.Parse(responseFortisAccountCreate.Content);
+                            Console.WriteLine($"Ошибка при создании аккаунта! Детали ошибки: \r\n {jobject["detail"]}");
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"Message: {ex.Message} \r\n StackTrace:{ex.StackTrace}");
+                            throw;
+                        }
+                    }
+                    Console.WriteLine("Что-то пошло не так, попробуйте ещё раз");
+                }
+            } while (responseFortisAccountCreate.StatusCode != HttpStatusCode.Created);
+            
+            
+            Console.WriteLine("Компания успешно создана! На указанный email было выслано письмо с ссылкой на установление  пароля.\r\nНажмите любую клавишу для закрытия окна...");
+            Console.ReadLine();
         }
 
         private static Dictionary<string, object> ContextPrepare()
